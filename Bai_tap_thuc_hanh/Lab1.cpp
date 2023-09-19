@@ -1,6 +1,7 @@
 /*
     Author : Trinh Duong Hoan
     Created : 12/09/2023
+    updated : 19/09/2023
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,10 +28,11 @@ void init(WORD &a, char w[], char m[])
 void inWORD(WORD &x)
 {
     printf("Nhap ten cua tu : ");
-    scanf("%s", x.Name);
     fflush(stdin);
+    gets(x.Name);
     printf("NHap nghia cua tu : ");
-    scanf("%s", x.Meaning);fflush(stdin);
+    gets(x.Meaning);
+    fflush(stdin);
 }
 // Hàm xuất một từ
 void outWORD(WORD x)
@@ -138,23 +140,25 @@ void readFile(char fileName[])
 void updateWord(char fileName[], char name[], char newMean[])
 {
     FILE *f = fopen(fileName, "rb+");
-    char tmp[] = "cc.bin";
     WORD a;
+    WORD res;
+    init(res, name, newMean);
     while (fread(&a, sizeof(WORD), 1, f) == 1)
     {
-        if (strcmp(a.Name, name) == 0)
-            strcpy(a.Meaning, newMean);
-        writeWord(tmp, a);
+        if (strcmp(a.Name, res.Name) == 0)
+        {
+            fseek(f, -sizeof(a), SEEK_CUR);
+            fwrite(&res, sizeof(res), 1, f);
+            fclose(f);
+            return;
+        }
     }
-    fclose(f);
-    remove(fileName);
-    rename(tmp, fileName);
 }
 // Hàm xóa một word trong tệp
 void removeWord(char fileName[], char name[])
 {
     FILE *f = fopen(fileName, "rb+");
-    char tmp[] = "cc.bin";
+    char tmp[] = "hehe.bin";
     WORD a;
     while (fread(&a, sizeof(WORD), 1, f) == 1)
     {
@@ -193,75 +197,91 @@ int main()
     while (running)
     {
         scanf("%d", &test);
-        switch (test){
-            case 1:{
-                inWORD(Array[lenArray++]);
-                break;
-            }
-            case 2:{
-                int ans;
-                do{
-                    printf("Nhap vao vi tri can in : ");
-                    scanf("%d", &ans);
-                }while(ans < 0 || ans >= lenArray);
+        switch (test)
+        {
+        case 1:
+        {
+            inWORD(Array[lenArray++]);
+            break;
+        }
+        case 2:
+        {
+            int ans;
+            do
+            {
+                printf("Nhap vao vi tri can in : ");
+                scanf("%d", &ans);
+            } while (ans < 0 || ans >= lenArray);
 
-                outWORD(Array[ans]);
-                break;
-            }
-            case 3:{
-                sortName(Array,lenArray);
-                printf("Mang sau khi duoc sap xep :\n ");
-                outArray(Array, lenArray);
-                break;
-            }
-            case 4:{
-                char name[256];
-                printf("Nhap vao Name can tim: ");
-                scanf("%s", name);
-                int pos = searchName(Array, lenArray, name);
-                if(pos == -1) printf("Khong tim thay !!\n");
-                else printf("Vi tri : %d\n", pos);
-                break;
-            }
-            case 5:{
-                WORD word;
-                inWORD(word);
-                writeWord(out, word);
-                break;
-            }
-            case 6:{
-                writeFile(out, Array, lenArray);
-                break;
-            }
-            case 7:{
-                readFile(out);
-                break;
-            }
-            case 8:{
-                readWord(out);
-                break;
-            }
-            case 9:{
-                char name[256], newMean[512];
-                printf("Nhap NAME can doi nghia: ");
-                scanf("%s", name);
-                printf("Nhap nghia moi cho NAME: ");
-                scanf("%s", newMean);
-                updateWord(out, name, newMean);
-                break;
-            }
-            case 10:{
-                char del[256];
-                printf("Nhap NAME can xoa: ");
-                scanf("%s", del);
-                removeWord(out, del);
-                break;
-            }
-            default:{
-                running = 0;
-                break;
-            }
-
+            outWORD(Array[ans]);
+            break;
+        }
+        case 3:
+        {
+            sortName(Array, lenArray);
+            printf("Mang sau khi duoc sap xep :\n ");
+            outArray(Array, lenArray);
+            break;
+        }
+        case 4:
+        {
+            char name[256];
+            printf("Nhap vao Name can tim: ");
+            scanf("%s", name);
+            int pos = searchName(Array, lenArray, name);
+            if (pos == -1)
+                printf("Khong tim thay !!\n");
+            else
+                printf("Vi tri : %d\n", pos);
+            break;
+        }
+        case 5:
+        {
+            WORD word;
+            inWORD(word);
+            writeWord(out, word);
+            break;
+        }
+        case 6:
+        {
+            writeFile(out, Array, lenArray);
+            break;
+        }
+        case 7:
+        {
+            readFile(out);
+            break;
+        }
+        case 8:
+        {
+            readWord(out);
+            break;
+        }
+        case 9:
+        {
+            char name[256], newMean[512];
+            printf("Nhap NAME can doi nghia: ");
+            fflush(stdin);
+            gets(name);
+            printf("Nhap nghia moi cho NAME: ");
+            gets(newMean);
+            fflush(stdin);
+            updateWord(out, name, newMean);
+            break;
+        }
+        case 10:
+        {
+            char del[256];
+            printf("Nhap NAME can xoa: ");
+            scanf("%s", del);
+            removeWord(out, del);
+            break;
+        }
+        default:
+        {
+            running = 0;
+            break;
+        }
         }
     }
     return 0;
