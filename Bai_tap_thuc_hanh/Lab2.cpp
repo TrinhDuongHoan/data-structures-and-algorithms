@@ -1,6 +1,6 @@
 /*
     Author : Trinh Duong Hoan
-    Created : 24/09/29223
+    Created : 24/09/2023
 */
 #include<stdio.h>
 #include<string.h>
